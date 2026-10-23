@@ -1,0 +1,3 @@
+# Cooldowns stay in memory
+
+The Cooldown and Rate Limit state is a Lua table that lives for the session. SavedVariables holds settings only, so the addon never writes another player's name to disk. The cost is that a `/reload` or a new login clears every Cooldown, so a sender who got a Reply just before can get one more. The Rate Limit still caps the total. We considered saving each sender with a `time()` stamp and pruning expired entries on load (exact Cooldowns across reloads, but player names in a file on disk for as long as 15 minutes, and a pruning path to get right). Revisit if players report a second Reply after a reload as a real problem.

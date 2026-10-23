@@ -1,0 +1,14 @@
+## Interface: 16001
+## Title: Summon Boundaries
+## Notes: Answers summon requests from strangers with a firm reply, so being a warlock doesn't make you a taxi.
+## Author: KidMoxie
+## Version: @project-version@
+## IconTexture: Interface\Icons\Spell_Shadow_Twilight
+## Category: Chat
+## SavedVariables: SummonBoundariesDB
+## X-License: MIT
+## X-Website: https://github.com/dbspringer/summon-boundaries
+
+locales\enUS.lua
+src\Config.lua
+SummonBoundaries.lua

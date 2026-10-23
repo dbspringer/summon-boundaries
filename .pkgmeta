@@ -1,0 +1,17 @@
+package-as: SummonBoundaries
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - docs
+  - .github
+  - .luacheckrc
+  - .busted
+  - spec
+  - export.sh
+  - README.md
+  - AGENTS.md
+  - CLAUDE.md
+  - CONTEXT.md

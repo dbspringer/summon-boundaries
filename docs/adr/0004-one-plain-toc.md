@@ -1,0 +1,3 @@
+# One plain TOC
+
+The addon ships one `SummonBoundaries.toc` with `## Interface: 16001`, the same as SCT Mover and NameplateSCT Reforged. Both load on the Forever client this way, and the BigWigs packager reads 16001 as game version 1.60.1 for the CurseForge upload. We considered a `SummonBoundaries_Camelot.toc` (the wiki documents the `_Camelot` suffix, and the packager recognises it), which would only be needed if one repo shipped different files to different clients. A second client goes in the same `## Interface:` line as a comma list, as SCT Mover does for TBC Anniversary. Revisit if a client needs different files.
