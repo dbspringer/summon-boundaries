@@ -11,4 +11,5 @@
 
 locales\enUS.lua
 src\Config.lua
+src\Matcher.lua
 SummonBoundaries.lua
