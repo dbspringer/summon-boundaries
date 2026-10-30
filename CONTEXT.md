@@ -12,6 +12,10 @@ _Avoid_: Summon whisper, request, ask
 The one whisper the addon sends back to a Summon Request. Its text is a setting, and `{fee}` in it stands for the Fee.
 _Avoid_: Response, auto-response, answer
 
+**Sender**:
+The character a whisper comes from. Two whispers have the same Sender only when the same character sends them, whatever form the name takes.
+_Avoid_: Player, name, author
+
 **Fee**:
 The compensation the Reply suggests, as text the player writes, such as `1g`. The addon never checks that anyone pays it.
 _Avoid_: Price, payment, tip
@@ -21,7 +25,7 @@ The two other players a Ritual of Summoning needs to click the portal.
 _Avoid_: Helpers, assistants
 
 **Exempt Sender**:
-A sender who never gets a Reply: a party or raid member always, and a friend or guild member when that setting is on.
+A Sender who never gets a Reply: a party or raid member always, and a friend (a Battle.net friend's character too) or guild member when that setting is on.
 _Avoid_: Whitelist, allow list
 
 **Cooldown**:
