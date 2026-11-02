@@ -22,6 +22,9 @@ local function Whisper(overrides)
         guid = "Player-1",
         flags = "",
         isSelf = false,
+        inGroup = false,
+        isFriend = false,
+        isGuildMember = false,
     }
     for key, value in pairs(overrides or {}) do
         whisper[key] = value
@@ -66,6 +69,33 @@ describe("Policy", function()
 
     it("skips a whisper from the player's own character", function()
         assert.are.equal("filtered", Handle(policy, Whisper({ isSelf = true }), settings, 0))
+    end)
+
+    describe("Exempt Senders", function()
+        it("never replies to a party or raid member", function()
+            assert.are.equal("exempt", Handle(policy, Whisper({ inGroup = true }), settings, 0))
+        end)
+
+        it("skips a friend or guild member while that setting is on", function()
+            assert.are.equal("exempt", Handle(policy, Whisper({ isFriend = true }), settings, 0))
+            assert.are.equal("exempt", Handle(policy, Whisper({ isGuildMember = true }), settings, 0))
+        end)
+
+        it("replies to a friend or guild member once that setting is off", function()
+            local off = Settings({ exemptFriends = false, exemptGuild = false })
+            assert.are.equal("reply", Handle(policy, Whisper({ guid = "Player-1", isFriend = true }), off, 0))
+            assert.are.equal("reply", Handle(policy, Whisper({ guid = "Player-2", isGuildMember = true }), off, 0))
+        end)
+
+        it("skips a Sender who answers the player's own whisper", function()
+            policy:RecordWhisperSent("Player-1", settings, 0)
+            assert.are.equal("exempt", Handle(policy, Whisper({ text = "yes, summon pls" }), settings, 14 * MINUTE))
+        end)
+
+        it("replies to that Sender once the conversation is older than the Cooldown length", function()
+            policy:RecordWhisperSent("Player-1", settings, 0)
+            assert.are.equal("reply", Handle(policy, Whisper(), settings, 15 * MINUTE))
+        end)
     end)
 
     describe("Cooldown", function()

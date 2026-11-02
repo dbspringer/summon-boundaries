@@ -18,12 +18,34 @@ Instance.__index = Instance
 function Policy.New()
     return setmetatable({
         lastReplyAt = {}, -- GUID -> time of the last Reply to that Sender
+        lastWhisperedAt = {}, -- GUID -> time the player last whispered that character
         replyTimes = {}, -- times of recent Replies to anyone, oldest first
     }, Instance)
 end
 
 local function CooldownSeconds(settings)
     return settings.cooldownMinutes * 60
+end
+
+-- Removes each GUID whose time is maxAge or more seconds before now.
+local function DropExpired(timesByGuid, maxAge, now)
+    for guid, at in pairs(timesByGuid) do
+        if now - at >= maxAge then
+            timesByGuid[guid] = nil
+        end
+    end
+end
+
+local function IsWithin(at, maxAge, now)
+    return at ~= nil and now - at < maxAge
+end
+
+function Instance:IsExempt(whisper, settings, now)
+    return whisper.inGroup
+        or (settings.exemptFriends and whisper.isFriend)
+        or (settings.exemptGuild and whisper.isGuildMember)
+        -- An answer to the player's own whisper is part of a conversation the player started.
+        or IsWithin(self.lastWhisperedAt[whisper.guid], CooldownSeconds(settings), now)
 end
 
 function Instance:CountRecentReplies(now)
@@ -48,8 +70,10 @@ function Instance:Decide(whisper, settings, now)
     if not Matcher.IsSummonRequest(whisper.text) then
         return "no-match"
     end
-    local lastReplyAt = self.lastReplyAt[whisper.guid]
-    if lastReplyAt and now - lastReplyAt < CooldownSeconds(settings) then
+    if self:IsExempt(whisper, settings, now) then
+        return "exempt"
+    end
+    if IsWithin(self.lastReplyAt[whisper.guid], CooldownSeconds(settings), now) then
         return "cooldown"
     end
     if self:CountRecentReplies(now) >= RATE_LIMIT_REPLIES then
@@ -60,12 +84,7 @@ end
 
 -- Records a Reply to the Sender with this GUID, and drops entries that no longer matter.
 function Instance:RecordReply(guid, settings, now)
-    local cooldown = CooldownSeconds(settings)
-    for key, at in pairs(self.lastReplyAt) do
-        if now - at >= cooldown then
-            self.lastReplyAt[key] = nil
-        end
-    end
+    DropExpired(self.lastReplyAt, CooldownSeconds(settings), now)
     self.lastReplyAt[guid] = now
 
     local recent = {}
@@ -76,4 +95,10 @@ function Instance:RecordReply(guid, settings, now)
     end
     recent[#recent + 1] = now
     self.replyTimes = recent
+end
+
+-- Records a whisper the player sent to the character with this GUID.
+function Instance:RecordWhisperSent(guid, settings, now)
+    DropExpired(self.lastWhisperedAt, CooldownSeconds(settings), now)
+    self.lastWhisperedAt[guid] = now
 end
