@@ -38,7 +38,8 @@ local function OnWhisper(text, sender, flags, guid)
     -- Recorded before the send, so a send that errors never leads to a second Reply.
     -- No pcall, so that error still reaches the player's error display.
     policy:RecordReply(guid, settings, now)
-    C_ChatInfo.SendChatMessage(Config.FormatReply(settings), "WHISPER", nil, sender)
+    local knowsSummon = C_SpellBook.IsSpellKnown(Config.SUMMON_SPELL_ID)
+    C_ChatInfo.SendChatMessage(Config.FormatReply(settings, knowsSummon), "WHISPER", nil, sender)
 end
 
 -- Fires for every whisper the player sends, our own Reply too.

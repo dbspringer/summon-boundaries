@@ -8,14 +8,20 @@ ns.Config = Config
 -- The chat server drops a message longer than this, in bytes.
 Config.MAX_MESSAGE_LENGTH = 255
 
+-- Ritual of Summoning. A warlock learns it from a trainer (at level 20 in the original game), so a
+-- warlock without it can't summon at all.
+Config.SUMMON_SPELL_ID = 698
+
 Config.DEFAULTS = {
     -- A fresh install sends nothing until the player turns it on.
     enabled = false,
     fee = "1g",
     mentionFee = true,
+    noSpellReply = true,
     -- luacheck: push no max line length
     message = L["A summon requires two other players, not just a warlock. If you'd like one, please arrange two clickers and offer {fee} for the trouble. Otherwise, please make your own way here."],
     messageNoFee = L["A summon requires two other players, not just a warlock. If you'd like one, please arrange two clickers. Otherwise, please make your own way here."],
+    messageNoSpell = L["I can't summon yet, since I haven't learned Ritual of Summoning. Please make your own way here."],
     -- luacheck: pop
     cooldownMinutes = 15,
     exemptFriends = true,
@@ -40,8 +46,19 @@ local function IsContinuationByte(byte)
     return byte ~= nil and byte >= 0x80 and byte < 0xC0
 end
 
-function Config.FormatReply(settings)
-    local template = settings.mentionFee and settings.message or settings.messageNoFee
+local function ReplyTemplate(settings, knowsSummon)
+    if settings.noSpellReply and not knowsSummon then
+        return settings.messageNoSpell
+    end
+    if settings.mentionFee then
+        return settings.message
+    end
+    return settings.messageNoFee
+end
+
+-- knowsSummon: whether the player's character knows Ritual of Summoning, which the shell looks up.
+function Config.FormatReply(settings, knowsSummon)
+    local template = ReplyTemplate(settings, knowsSummon)
     -- A function replacement keeps a "%" in the fee from reading as a capture.
     local fee = tostring(settings.fee)
     local reply = template:gsub("{fee}", function()

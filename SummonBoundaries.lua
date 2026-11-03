@@ -27,7 +27,8 @@ local function PrintStatus()
         Print(L["Auto-replies are off. Type /sb on to turn them on."])
     end
     Print(L["Fee: %s. Cooldown: %d minutes."]:format(settings.fee, settings.cooldownMinutes))
-    Print(L["Reply: %s"]:format(Config.FormatReply(settings)))
+    local knowsSummon = C_SpellBook.IsSpellKnown(Config.SUMMON_SPELL_ID)
+    Print(L["Reply: %s"]:format(Config.FormatReply(settings, knowsSummon)))
 end
 
 local frame = CreateFrame("Frame")
