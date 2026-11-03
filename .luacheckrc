@@ -12,8 +12,17 @@ globals = {
 
 read_globals = {
   "C_AddOns",
+  "C_BattleNet",
+  "C_ChatInfo",
+  "C_FriendList",
+  "C_PartyInfo",
   "CreateFrame",
   "DEFAULT_CHAT_FRAME",
+  "GetTime",
+  "IsGuildMember",
+  "issecretvalue",
+  "UnitClass",
+  "UnitGUID",
 }
 
 files["spec"] = { std = "+busted" }
