@@ -1,5 +1,5 @@
 local ns = {}
-for _, file in ipairs({ "locales/enUS.lua", "src/Config.lua", "src/Matcher.lua", "src/Policy.lua" }) do
+for _, file in ipairs({ "locales/enUS.lua", "src/Matcher.lua", "src/Config.lua", "src/Policy.lua" }) do
     assert(loadfile(file))("SummonBoundaries", ns)
 end
 local Config = ns.Config
@@ -51,6 +51,11 @@ describe("Policy", function()
 
     it("replies to a stranger's Summon Request", function()
         assert.are.equal("reply", Handle(policy, Whisper(), settings, 0))
+    end)
+
+    it("replies to the player's own keyword while that override is on", function()
+        local custom = Settings({ customKeywords = true, keywords = "beam me up" })
+        assert.are.equal("reply", Handle(policy, Whisper({ text = "beam me up!" }), custom, 0))
     end)
 
     it("ignores a whisper that is not a Summon Request", function()

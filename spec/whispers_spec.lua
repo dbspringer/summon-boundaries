@@ -99,7 +99,7 @@ local ns
 
 local function LoadAddon()
     ns = {}
-    local files = { "locales/enUS.lua", "src/Config.lua", "src/Matcher.lua", "src/Policy.lua", "src/Whispers.lua" }
+    local files = { "locales/enUS.lua", "src/Matcher.lua", "src/Config.lua", "src/Policy.lua", "src/Whispers.lua" }
     for _, file in ipairs(files) do
         assert(loadfile(file))("SummonBoundaries", ns)
     end

@@ -1,5 +1,6 @@
 local ns = {}
 assert(loadfile("locales/enUS.lua"))("SummonBoundaries", ns)
+assert(loadfile("src/Matcher.lua"))("SummonBoundaries", ns)
 assert(loadfile("src/Config.lua"))("SummonBoundaries", ns)
 local Config = ns.Config
 

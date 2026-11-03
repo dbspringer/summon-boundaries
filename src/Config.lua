@@ -1,6 +1,7 @@
 -- Pure Lua: no WoW API calls, so the specs can load this file directly.
 local _, ns = ...
 local L = ns.L
+local Matcher = ns.Matcher
 
 local Config = {}
 ns.Config = Config
@@ -26,6 +27,9 @@ Config.DEFAULTS = {
     cooldownMinutes = 15,
     exemptFriends = true,
     exemptGuild = true,
+    -- Off: the built-in keywords. On: the player's own list in `keywords`.
+    customKeywords = false,
+    keywords = Matcher.BUILT_IN_KEYWORDS,
 }
 
 -- Fills each missing or wrong-type key from DEFAULTS and keeps every value the

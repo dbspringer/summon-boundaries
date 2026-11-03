@@ -1,5 +1,5 @@
 local ns = {}
-for _, file in ipairs({ "locales/enUS.lua", "src/Config.lua", "src/Commands.lua" }) do
+for _, file in ipairs({ "locales/enUS.lua", "src/Matcher.lua", "src/Config.lua", "src/Commands.lua" }) do
     assert(loadfile(file))("SummonBoundaries", ns)
 end
 local Config = ns.Config
