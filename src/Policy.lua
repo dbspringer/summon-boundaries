@@ -67,7 +67,7 @@ function Instance:Decide(whisper, settings, now)
     if whisper.isSelf or FILTERED_FLAGS[whisper.flags] then
         return "filtered"
     end
-    if not Matcher.IsSummonRequest(whisper.text) then
+    if not Matcher.IsSummonRequest(whisper.text, Matcher.ActiveKeywords(settings)) then
         return "no-match"
     end
     if self:IsExempt(whisper, settings, now) then

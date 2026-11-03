@@ -10,8 +10,8 @@
 ## X-Website: https://github.com/dbspringer/summon-boundaries
 
 locales\enUS.lua
-src\Config.lua
 src\Matcher.lua
+src\Config.lua
 src\Policy.lua
 src\Whispers.lua
 src\Commands.lua
