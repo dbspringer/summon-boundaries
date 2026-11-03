@@ -120,6 +120,17 @@ describe("/sb", function()
             local lines = Run("fee " .. ("9"):rep(100))
             assert.is_true(Shows(lines, "Strangers get only the first 255."))
         end)
+
+        it("warns when turning the Fee on brings back a Reply that is too long", function()
+            Run("fee " .. ("9"):rep(100))
+            Run("fee off")
+            assert.is_true(Shows(Run("fee on"), "Strangers get only the first 255."))
+        end)
+
+        it("warns when turning the Fee off brings in a Reply that is too long", function()
+            settings.messageNoFee = ("a"):rep(300)
+            assert.is_true(Shows(Run("fee off"), "Your Reply is 300 bytes."))
+        end)
     end)
 
     it("turns the no-spell Reply on and off", function()

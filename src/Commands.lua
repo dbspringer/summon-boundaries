@@ -114,8 +114,9 @@ local function SetFee(settings, context, argument)
         settings.fee = argument
         settings.mentionFee = true
         lines = { L["Fee set to %s."]:format(argument) }
-        LengthWarning(lines, settings)
     end
+    -- Either branch can change which text goes out, so both check its length.
+    LengthWarning(lines, settings)
     lines[#lines + 1] = ReplyLine(settings, context)
     return lines
 end
