@@ -12,6 +12,7 @@ local client
 local function StubClient()
     client = {
         class = "WARLOCK",
+        knowsSummon = true,
         now = 0,
         lockdown = false,
         secrets = {},
@@ -41,6 +42,11 @@ local function StubClient()
     _G.UnitClass = function()
         return "Classname", client.class
     end
+    _G.C_SpellBook = {
+        IsSpellKnown = function(spellID)
+            return spellID == 698 and client.knowsSummon
+        end,
+    }
     _G.UnitGUID = function()
         return PLAYER_GUID
     end
@@ -123,7 +129,7 @@ local function WhisperSent(text, target, guid)
 end
 
 local function Reply()
-    return ns.Config.FormatReply(ns.settings)
+    return ns.Config.FormatReply(ns.settings, true)
 end
 
 describe("Whispers", function()
@@ -140,6 +146,14 @@ describe("Whispers", function()
             { message = Reply(), chatType = "WHISPER", languageID = nil, target = "First Last" },
             { message = Reply(), chatType = "WHISPER", languageID = nil, target = "Other-Realm" },
         }, client.sent)
+    end)
+
+    it("tells the sender when the warlock hasn't learned Ritual of Summoning yet", function()
+        client.knowsSummon = false
+        Login()
+        Whisper("summon?", "Stranger", "Player-1")
+        assert.are.equal(1, #client.sent)
+        assert.are.equal(ns.Config.DEFAULTS.messageNoSpell, client.sent[1].message)
     end)
 
     it("stays quiet for a whisper that is not a Summon Request", function()

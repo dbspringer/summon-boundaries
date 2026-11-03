@@ -9,7 +9,7 @@ A whisper from another player that asks the player to summon them, such as "sum 
 _Avoid_: Summon whisper, request, ask
 
 **Reply**:
-The one whisper the addon sends back to a Summon Request. Its text is a setting, and `{fee}` in it stands for the Fee.
+The one whisper the addon sends back to a Summon Request. Its text is a setting, and `{fee}` in it stands for the Fee. A warlock who hasn't learned Ritual of Summoning yet sends a different text, which says so, unless the player turns that off.
 _Avoid_: Response, auto-response, answer
 
 **Sender**:

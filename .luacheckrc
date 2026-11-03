@@ -14,6 +14,7 @@ read_globals = {
   "C_AddOns",
   "C_BattleNet",
   "C_ChatInfo",
+  "C_SpellBook",
   "C_FriendList",
   "C_PartyInfo",
   "CreateFrame",

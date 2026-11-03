@@ -101,7 +101,7 @@ describe("Policy", function()
     describe("Cooldown", function()
         it("stops two auto-responders after one exchange", function()
             assert.are.equal("reply", Handle(policy, Whisper(), settings, 0))
-            local echo = "Auto-reply: " .. Config.FormatReply(settings)
+            local echo = "Auto-reply: " .. Config.FormatReply(settings, true)
             assert.are.equal("cooldown", Handle(policy, Whisper({ text = echo }), settings, 1))
         end)
 

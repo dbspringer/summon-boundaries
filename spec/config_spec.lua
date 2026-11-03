@@ -32,24 +32,34 @@ end)
 
 describe("Reply", function()
     it("puts the fee in place of {fee}", function()
-        local reply = Config.FormatReply(SettingsWith({ fee = "2g" }))
+        local reply = Config.FormatReply(SettingsWith({ fee = "2g" }), true)
         assert.truthy(reply:find("offer 2g for the trouble", 1, true))
         assert.falsy(reply:find("{fee}", 1, true))
     end)
 
     it("uses the no-fee text when the fee is off", function()
-        local reply = Config.FormatReply(SettingsWith({ fee = "2g", mentionFee = false }))
+        local reply = Config.FormatReply(SettingsWith({ fee = "2g", mentionFee = false }), true)
         assert.are.equal(Config.DEFAULTS.messageNoFee, reply)
     end)
 
     it("inserts a fee with % as plain text", function()
-        local reply = Config.FormatReply(SettingsWith({ fee = "50%", message = "pay {fee}" }))
+        local reply = Config.FormatReply(SettingsWith({ fee = "50%", message = "pay {fee}" }), true)
         assert.are.equal("pay 50%", reply)
+    end)
+
+    it("uses the no-spell text for a warlock who hasn't learned the spell", function()
+        local reply = Config.FormatReply(SettingsWith({ fee = "2g" }), false)
+        assert.are.equal(Config.DEFAULTS.messageNoSpell, reply)
+    end)
+
+    it("sends the normal reply without the spell once the no-spell switch is off", function()
+        local reply = Config.FormatReply(SettingsWith({ fee = "2g", noSpellReply = false }), false)
+        assert.truthy(reply:find("offer 2g for the trouble", 1, true))
     end)
 
     it("cuts an over-long reply to the chat limit on a character boundary", function()
         -- "é" is two bytes, and 254 ASCII bytes put its first byte at position 255.
-        local reply = Config.FormatReply(SettingsWith({ message = ("a"):rep(254) .. "é tail" }))
+        local reply = Config.FormatReply(SettingsWith({ message = ("a"):rep(254) .. "é tail" }), true)
         assert.are.equal(("a"):rep(254), reply)
     end)
 end)
