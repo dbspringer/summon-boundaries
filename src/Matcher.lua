@@ -11,6 +11,11 @@ Matcher.BUILT_IN_KEYWORDS = "sum, summ, summo, summon, summons, summoning, smn, 
 -- A keyword this short matches only as the whole message, so "1" can't match "I have 1 question".
 local WHOLE_MESSAGE_MAX_LENGTH = 2
 
+-- Counts UTF-8 characters: every byte except a continuation byte starts one.
+local function CharacterCount(text)
+    return select(2, text:gsub("[^\128-\191]", ""))
+end
+
 -- Lowercase, with punctuation as spaces and single spaces between words.
 local function Normalize(text)
     return (text:lower():gsub("%p", " "):gsub("%s+", " "):match("^%s*(.-)%s*$"))
@@ -54,7 +59,7 @@ function Matcher.IsSummonRequest(text, keywords)
     -- Spaces at both ends, so every keyword can match as whole words with one plain search.
     local padded = " " .. message .. " "
     for _, keyword in ipairs(keywords) do
-        if #keyword <= WHOLE_MESSAGE_MAX_LENGTH then
+        if CharacterCount(keyword) <= WHOLE_MESSAGE_MAX_LENGTH then
             if message == keyword then
                 return true
             end

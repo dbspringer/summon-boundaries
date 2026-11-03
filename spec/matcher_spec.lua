@@ -73,6 +73,13 @@ describe("Summon Request matching", function()
             assert.is_false(Matches("I have 1 question", settings))
         end)
 
+        it("counts letters, not bytes, for that rule", function()
+            -- Each Cyrillic letter is two bytes in UTF-8, so this keyword is 2 letters and 4 bytes.
+            local settings = { customKeywords = true, keywords = "тп" }
+            assert.is_true(Matches("тп", settings))
+            assert.is_false(Matches("дай тп плиз", settings))
+        end)
+
         it("follow an edit to the list", function()
             local settings = { customKeywords = true, keywords = "beam me up" }
             assert.is_true(Matches("beam me up", settings))
