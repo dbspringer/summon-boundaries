@@ -1,5 +1,4 @@
 local addonName, ns = ...
-local L = ns.L
 local Config = ns.Config
 
 -- Warlock class colour.
@@ -18,19 +17,6 @@ local function GetVersion()
     return version
 end
 
-local function PrintStatus()
-    local settings = ns.settings
-    Print(L["Version %s"]:format(GetVersion()))
-    if settings.enabled then
-        Print(L["Auto-replies are on."])
-    else
-        Print(L["Auto-replies are off. Type /sb on to turn them on."])
-    end
-    Print(L["Fee: %s. Cooldown: %d minutes."]:format(settings.fee, settings.cooldownMinutes))
-    local knowsSummon = C_SpellBook.IsSpellKnown(Config.SUMMON_SPELL_ID)
-    Print(L["Reply: %s"]:format(Config.FormatReply(settings, knowsSummon)))
-end
-
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, _, loadedName)
@@ -43,6 +29,14 @@ frame:SetScript("OnEvent", function(self, _, loadedName)
 end)
 
 SLASH_SUMMONBOUNDARIES1 = "/sb"
-SlashCmdList.SUMMONBOUNDARIES = function()
-    PrintStatus()
+SlashCmdList.SUMMONBOUNDARIES = function(input)
+    local _, class = UnitClass("player")
+    local context = {
+        isWarlock = class == "WARLOCK",
+        knowsSummon = C_SpellBook.IsSpellKnown(Config.SUMMON_SPELL_ID),
+        version = GetVersion(),
+    }
+    for _, line in ipairs(ns.Commands.Run(input, ns.settings, context)) do
+        Print(line)
+    end
 end
