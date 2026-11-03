@@ -25,7 +25,7 @@ The two other players a Ritual of Summoning needs to click the portal.
 _Avoid_: Helpers, assistants
 
 **Exempt Sender**:
-A Sender who never gets a Reply: a party or raid member always, and a friend (a Battle.net friend's character too) or guild member when that setting is on.
+A Sender who never gets a Reply. Always: a party or raid member, and a Sender the player whispered within the Cooldown length, since that Sender's whisper is part of a conversation the player started. When that setting is on: a friend (a Battle.net friend's character too) or a guild member.
 _Avoid_: Whitelist, allow list
 
 **Cooldown**:
@@ -41,5 +41,5 @@ A client state in which the text and sender of a whisper are secret values that 
 _Avoid_: Combat lockdown (a different restriction, on protected frames)
 
 **Decision**:
-What the core returns for one whisper: send the Reply, or the reason it doesn't (disabled, filtered, loop, no match, exempt, cooldown, rate limit, lockdown).
+What the core returns for one whisper: send the Reply, or the reason it doesn't (disabled, filtered, no match, exempt, cooldown, rate limit, lockdown).
 _Avoid_: Result, verdict

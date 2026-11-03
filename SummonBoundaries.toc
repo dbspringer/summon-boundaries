@@ -12,4 +12,5 @@
 locales\enUS.lua
 src\Config.lua
 src\Matcher.lua
+src\Policy.lua
 SummonBoundaries.lua
