@@ -1,5 +1,6 @@
 local ns = {}
-for _, file in ipairs({ "locales/enUS.lua", "src/Matcher.lua", "src/Config.lua", "src/Commands.lua" }) do
+local files = { "locales/enUS.lua", "src/Matcher.lua", "src/Config.lua", "src/Options.lua", "src/Commands.lua" }
+for _, file in ipairs(files) do
     assert(loadfile(file))("SummonBoundaries", ns)
 end
 local Config = ns.Config
@@ -178,6 +179,14 @@ describe("/sb", function()
         it("shows a warlock's Reply on another class", function()
             assert.is_true(Shows(Run("test", MAGE), Config.FormatReply(settings, true)))
         end)
+    end)
+
+    it("asks the shell to open the settings panel, for options and its aliases", function()
+        for _, word in ipairs({ "options", "CONFIG", "settings" }) do
+            local _, action = Run(word)
+            assert.are.equal("options", action, word)
+        end
+        assert.is_true(Shows(Run("help"), "/sb options"))
     end)
 
     it("names an unknown command and lists the commands", function()

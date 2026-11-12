@@ -11,3 +11,5 @@ First release, for WoW: Forever (the 1.60 client).
 - Auto-replies start off. Type `/sb on` to turn them on, and `/sb off` to stop.
 - Change your reply with `/sb message`, the fee with `/sb fee`, and how long each player waits for another reply with `/sb cooldown`
 - `/sb test` shows your reply without sending it, and `/sb help` lists every command
+- Every setting is also at Esc > Options > AddOns > Summon Boundaries, with a preview of your reply. `/sb options` opens it.
+- If the built-in keywords miss how people ask on your server, use your own list in the settings

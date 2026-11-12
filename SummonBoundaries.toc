@@ -14,5 +14,7 @@ src\Matcher.lua
 src\Config.lua
 src\Policy.lua
 src\Whispers.lua
+src\Options.lua
 src\Commands.lua
+src\Panel.lua
 SummonBoundaries.lua

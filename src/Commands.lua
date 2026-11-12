@@ -1,8 +1,9 @@
 -- Pure Lua: no WoW API calls, so the specs can load this file directly.
 -- The shell passes the client facts in `context`: isWarlock, knowsSummon, and version.
+-- Run returns the lines to print, and "options" as a second value when the shell should open the panel.
 local _, ns = ...
 local L = ns.L
-local Config = ns.Config
+local Options = ns.Options
 
 local Commands = {}
 ns.Commands = Commands
@@ -16,10 +17,14 @@ local HELP = {
     L["/sb nospell on | off: tell strangers when you haven't learned Ritual of Summoning."],
     L["/sb cooldown <minutes>: set how long each player waits for another Reply."],
     L["/sb test: show your Reply here, sent to no one."],
+    L["/sb options: open the settings panel."],
     L["/sb reset: set everything back to the defaults, with auto-replies off."],
 }
 
 local SWITCH = { on = true, off = false }
+
+-- The shell opens the settings panel when Run returns this action.
+local OPEN_OPTIONS = { options = true, config = true, settings = true }
 
 local function Append(lines, more)
     for _, line in ipairs(more) do
@@ -28,14 +33,8 @@ local function Append(lines, more)
     return lines
 end
 
--- The Reply a stranger would get from this character. Another class shows a trained warlock's Reply,
--- since auto-replies only run on a warlock.
-local function ShownReply(settings, context)
-    return (Config.FormatReply(settings, context.knowsSummon or not context.isWarlock))
-end
-
 local function ReplyLine(settings, context)
-    return L["Reply: %s"]:format(ShownReply(settings, context))
+    return L["Reply: %s"]:format(Options.ShownReply(settings, context))
 end
 
 local function WarlockNote(lines, context)
@@ -45,16 +44,12 @@ local function WarlockNote(lines, context)
     return lines
 end
 
--- Warns when the text for the current Fee switch is too long to send whole.
-local function LengthWarning(lines, settings)
-    local _, fullLength = Config.FormatReply(settings, true)
-    if fullLength > Config.MAX_MESSAGE_LENGTH then
-        lines[#lines + 1] = L["Your Reply is %d bytes. Strangers get only the first %d."]:format(
-            fullLength,
-            Config.MAX_MESSAGE_LENGTH
-        )
+-- The lines for a setter's result: the refusal reason, or the confirmation and any warnings.
+local function ResultLines(result, confirmation)
+    if not result.saved then
+        return { result.reason }
     end
-    return lines
+    return Append({ confirmation }, result.warnings)
 end
 
 local function Status(settings, context)
@@ -85,18 +80,11 @@ local function SetMessage(settings, context, text)
     if text == "" then
         return { L["Type /sb message followed by the text of your Reply."] }
     end
-    local lines
+    local key, confirmation = "messageNoFee", L["Reply without the Fee set."]
     if settings.mentionFee then
-        settings.message = text
-        lines = { L["Reply with the Fee set."] }
-        if not text:find("{fee}", 1, true) then
-            lines[#lines + 1] = L["Your text has no {fee}, so the Fee won't show."]
-        end
-    else
-        settings.messageNoFee = text
-        lines = { L["Reply without the Fee set."] }
+        key, confirmation = "message", L["Reply with the Fee set."]
     end
-    LengthWarning(lines, settings)
+    local lines = ResultLines(Options.SetText(settings, key, text), confirmation)
     lines[#lines + 1] = ReplyLine(settings, context)
     return lines
 end
@@ -108,15 +96,11 @@ local function SetFee(settings, context, argument)
     local lines
     local switch = SWITCH[argument:lower()]
     if switch ~= nil then
-        settings.mentionFee = switch
-        lines = { switch and L["The Fee is on."] or L["The Fee is off."] }
+        local confirmation = switch and L["The Fee is on."] or L["The Fee is off."]
+        lines = ResultLines(Options.SetFeeShown(settings, switch), confirmation)
     else
-        settings.fee = argument
-        settings.mentionFee = true
-        lines = { L["Fee set to %s."]:format(argument) }
+        lines = ResultLines(Options.SetFee(settings, argument), L["Fee set to %s."]:format(argument))
     end
-    -- Either branch can change which text goes out, so both check its length.
-    LengthWarning(lines, settings)
     lines[#lines + 1] = ReplyLine(settings, context)
     return lines
 end
@@ -137,19 +121,12 @@ local function SetCooldown(settings, argument)
             L["Type /sb cooldown followed by a whole number of minutes, 1 or more."],
         }
     end
-    -- Digits only, so a sign, a decimal point, or an exponent never gets through.
-    local minutes = argument:find("^%d+$") and tonumber(argument)
-    if not minutes or minutes < 1 then
-        return { L["The Cooldown must be a whole number of minutes, 1 or more."] }
-    end
-    settings.cooldownMinutes = minutes
-    return { L["Cooldown set to %d minutes."]:format(minutes) }
+    local result = Options.SetCooldown(settings, argument)
+    return ResultLines(result, L["Cooldown set to %d minutes."]:format(settings.cooldownMinutes))
 end
 
 local function Reset(settings)
-    for key, value in pairs(Config.DEFAULTS) do
-        settings[key] = value
-    end
+    Options.Reset(settings)
     return { L["Settings reset. Auto-replies are off. Type /sb on to turn them on."] }
 end
 
@@ -173,7 +150,9 @@ function Commands.Run(input, settings, context)
     elseif command == "reset" then
         return Reset(settings)
     elseif command == "test" then
-        return { L["Test, sent to no one: %s"]:format(ShownReply(settings, context)) }
+        return { L["Test, sent to no one: %s"]:format(Options.ShownReply(settings, context)) }
+    elseif OPEN_OPTIONS[command] then
+        return {}, "options"
     end
     return Append({ L["Unknown command: %s."]:format(word) }, HELP)
 end

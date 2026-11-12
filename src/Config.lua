@@ -60,10 +60,9 @@ local function ReplyTemplate(settings, knowsSummon)
     return settings.messageNoFee
 end
 
--- knowsSummon: whether the player's character knows Ritual of Summoning, which the shell looks up.
--- Returns the Reply, cut to the chat limit, and the length in bytes before the cut.
-function Config.FormatReply(settings, knowsSummon)
-    local template = ReplyTemplate(settings, knowsSummon)
+-- Puts the Fee in place of {fee} in one Reply text. Returns the text, cut to the chat limit, and
+-- the length in bytes before the cut.
+function Config.FormatText(settings, template)
     -- A function replacement keeps a "%" in the fee from reading as a capture.
     local fee = tostring(settings.fee)
     local reply = template:gsub("{fee}", function()
@@ -79,4 +78,10 @@ function Config.FormatReply(settings, knowsSummon)
         reply = reply:sub(1, cut)
     end
     return reply, fullLength
+end
+
+-- knowsSummon: whether the player's character knows Ritual of Summoning, which the shell looks up.
+-- Returns the Reply a stranger gets, cut to the chat limit, and the length in bytes before the cut.
+function Config.FormatReply(settings, knowsSummon)
+    return Config.FormatText(settings, ReplyTemplate(settings, knowsSummon))
 end

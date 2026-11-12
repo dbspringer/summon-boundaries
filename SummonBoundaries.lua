@@ -1,4 +1,5 @@
 local addonName, ns = ...
+local L = ns.L
 local Config = ns.Config
 
 -- Warlock class colour.
@@ -28,15 +29,24 @@ frame:SetScript("OnEvent", function(self, _, loadedName)
     ns.settings = SummonBoundariesDB
 end)
 
-SLASH_SUMMONBOUNDARIES1 = "/sb"
-SlashCmdList.SUMMONBOUNDARIES = function(input)
+-- The client facts the core needs, for /sb and the panel's preview.
+function ns.ClientContext()
     local _, class = UnitClass("player")
-    local context = {
+    return {
         isWarlock = class == "WARLOCK",
         knowsSummon = C_SpellBook.IsSpellKnown(Config.SUMMON_SPELL_ID),
         version = GetVersion(),
     }
-    for _, line in ipairs(ns.Commands.Run(input, ns.settings, context)) do
+end
+
+SLASH_SUMMONBOUNDARIES1 = "/sb"
+SlashCmdList.SUMMONBOUNDARIES = function(input)
+    local lines, action = ns.Commands.Run(input, ns.settings, ns.ClientContext())
+    for _, line in ipairs(lines) do
         Print(line)
+    end
+    -- Opening can fail silently on Forever, so say where the panel is (Settings Panel Plan, decision 7).
+    if action == "options" and not ns.Panel.Open() then
+        Print(L["Open it at Esc > Options > AddOns > Summon Boundaries."])
     end
 end
